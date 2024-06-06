@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLASIFICADOR DE ANIMALES</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/prd.css') }}">
+
+    <!-- Estilos Bootstrap 5 -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css" />
+
+    <script type="importmap">
+        {
+            "imports": {
+                "@google/generative-ai": "https://esm.run/@google/generative-ai"
+            }
+        }
+    </script>
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">Animal-Guia!</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="fas fa-bars ms-1"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="#predecir">Predecir</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#instrucciones">Instrucciones</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contacto</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Inicio</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="hero">
+        <div class="column text-content">
+            <h1>Busca <br><span class="color-acento">&</span><br> Descubre</h1><br>
+            <button onclick="scrollToSection('predecir')">Diviértete</button>
+        </div>
+    </section>
+
+    <section id="predecir">
+        <div class="container">
+            <div class="predecir text-center">
+                <form action="/" method="post" enctype="multipart/form-data" id="animal-form">
+                    <h2 class="seleccionarr" style="color: white;">CLICK EN SELECCIONAR PARA INSERTAR IMAGEN:</h2>
+                    <label id="boton_imagen" class="bo" for="image">Seleccionar</label> <br>
+                    <input type="file" id="image" name="image" accept="image/*" title="Seleccionar imagen">
+                    <select id="model" name="model">
+                        {% for model_name in model_names %}
+                        <option value="{{ model_name }}">{{ model_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="link_blanco" type="submit">Predecir</button>
+                </form>
+
+                <div class="px-3 py-3">
+                    {% if image_path %}
+                    <div class="result">
+                        <h2 style="color: white;">Imagen seleccionada:</h2> <br>
+                        <img src="{{ url_for('static', filename='temp_image.jpg') }}" alt="Imagen seleccionada">
+                    </div>
+                    {% endif %}
+
+                    {% if predicted_results %}
+                    <div class="result">
+                        <h2>Resultado:</h2>
+                        {% for predicted_class in predicted_results %}
+                        Clase: {{ predicted_class }} de 255 pts. <br>
+                        <br>
+                        <form class="tiger-form" method="POST" data-description="{{ predicted_class }}">
+                            <button type="submit" class="btn btn-info">Mostrar Descripción</button>
+                        </form>
+                        <br>
+                        {% endfor %}
+                        <div style="background-color: #165802;" id="conversation" class="chat-box"
+                            contenteditable="false">
+                            {{ conversation | safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="instrucciones">
+        <div class="container">
+            <div class="img-container"></div>
+            <div class="texto">
+                <h2><span class="color-acento">Instrucciones</span></h2>
+                <p>Para usar este programa, primero haga clic en 'Seleccionar Imagen' y luego, después de seleccionarla,
+                    haga clic en 'Predecir'. El programa le mostrará un resultado indicando a qué animal se parece su
+                    imagen y un porcentaje de precisión asociado. Y luego darle al botón descripción para ver la
+                    descripción del animal</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacto-->
+    <section class="page-section" id="contact">
+        <div class="container">
+            <div class="text-center">
+                <h2 class="section-heading text-uppercase">CONTÁCTENOS</h2><br>
+                <h3 class="section-subheading text-muted">¿Tienes alguna pregunta o necesitas más información? ¡Estamos aquí para ayudarte!</h3>
+            </div>
+            <!-- * * * * * * * * * * * * * * *-->
+            <!-- * * SB Forms Contact Form * *-->
+            <!-- * * * * * * * * * * * * * * *-->
+            <!-- This form is pre-integrated with SB Forms.-->
+            <!-- To make this form functional, sign up at-->
+            <!-- https://startbootstrap.com/solution/contact-forms-->
+            <!-- to get an API token!-->
+            <form id="contactForm" data-sb-form-api-token="API_TOKEN">
+                <div class="row align-items-stretch mb-5">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <!-- Name input-->
+                            <input class="form-control" id="name" type="text" placeholder="Su nombre *" data-sb-validations="required" />
+                            <div class="invalid-feedback" data-sb-feedback="name:required">Se requiere un nombre.</div>
+                        </div>
+                        <div class="form-group">
+                            <!-- Email address input-->
+                            <input class="form-control" id="email" type="email" placeholder="Tu correo electrónico *" data-sb-validations="required,email" />
+                            <div class="invalid-feedback" data-sb-feedback="email:required">Se requiere un email.</div>
+                            <div class="invalid-feedback" data-sb-feedback="email:email">El correo no es válido.</div>
+                        </div>
+                        <div class="form-group mb-md-0">
+                            <!-- Phone number input-->
+                            <input class="form-control" id="phone" type="tel" placeholder="Su teléfono *" data-sb-validations="required" />
+                            <div class="invalid-feedback" data-sb-feedback="phone:required">Se requiere un número de teléfono.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group form-group-textarea mb-md-0">
+                            <!-- Message input-->
+                            <textarea class="form-control" id="message" placeholder="Tu mensaje *" data-sb-validations="required"></textarea>
+                            <div class="invalid-feedback" data-sb-feedback="message:required">Se requiere un mensaje.</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Submit success message-->
+                <!---->
+                <!-- This is what your users will see when the form-->
+                <!-- has successfully submitted-->
+                <div class="d-none" id="submitSuccessMessage">
+                    <div class="text-center text-white mb-3">
+                        <div class="fw-bolder">Envío de formulario exitoso!</div>
+                        <!--Para activar este formulario, regístrate en
+                        <br />
+                        <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>-->
+                    </div>
+                </div>
+                <!-- Submit error message-->
+                <!---->
+                <!-- This is what your users will see when there is-->
+                <!-- an error submitting the form-->
+                <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">¡Error al enviar el mensaje!</div></div>
+                <!-- Submit Button-->
+                <div class="text-center"><button class="btn btn-primary btn-xl text-uppercase disabled" id="submitButton" type="submit">Enviar mensaje</button></div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer-->
+    <footer class="footer py-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-4 text-lg-start">Copyright &copy; Animal guia! <span id="year"></span></div>
+                <div class="col-lg-4 my-3 my-lg-0">
+                    <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a class="btn btn-dark btn-social mx-2" href="https://www.youtube.com/@felipetutech" aria-label="LinkedIn" target="_blank"><i class="fab fa-youtube"></i></a>
+                </div>
+                <div class="col-lg-4 text-lg-end">Universidad Loyola. [La Paz - Bolivia]</div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+
+        function seleccionarImagen() {
+            document.getElementById('inputFile').click();
+        }
+
+        document.getElementById('inputFile').addEventListener('change', function (event) {
+            var archivo = event.target.files[0];
+            var lector = new FileReader();
+
+            lector.onload = function (event) {
+                var imagenMostrada = document.getElementById('imagenMostrada');
+                imagenMostrada.src = event.target.result;
+                imagenMostrada.style.display = 'block';
+            };
+
+            lector.readAsDataURL(archivo);
+        });
+
+        $(document).on('submit', '.tiger-form', function (event) {
+            event.preventDefault();
+            var $form = $(this);
+            $form.find('button[type="submit"]').prop('disabled', true);
+            $.ajax({
+                type: 'POST',
+                url: '/m',
+                data: {
+                    user_input: $form.data('description'),
+                    question: false
+                },
+                success: function (response) {
+                    $('#conversation').html(response.conversation);
+                },
+                complete: function () {
+                    $form.find('button[type="submit"]').prop('disabled', false);
+                }
+            });
+        });
+
+        function scrollToSection(sectionId) {
+            var section = document.getElementById(sectionId);
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+
+    <script type="module">
+        import { GoogleGenerativeAI } from '@google/generative-ai';
+
+        const API_KEY = 'AIzaSyAlzjpp5PUCnKwD8INVWBpFIk-_o355ghM';
+        const genAI = new GoogleGenerativeAI(API_KEY);
+
+        document.querySelectorAll('.tiger-form').forEach(form => {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                var descripcionSinNumeros = event.target.dataset.description.replace(/\d+/g, '');
+                const description = `Una descripcion sobre el animal ${descripcionSinNumeros}`;
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+                try {
+                    const result = await model.generateContent(description);
+                    const response = await result.response;
+                    document.getElementById('conversation').innerText = await response.text();
+                } catch (error) {
+                    console.error('Error al generar contenido:', error);
+                }
+            });
+        });
+    </script>
+    <script>
+        // Obtener el elemento span donde se mostrará el año
+        var yearSpan = document.getElementById("year");
+
+        // Obtener el año actual
+        var currentYear = new Date().getFullYear();
+
+        // Actualizar el contenido del span con el año actual
+        yearSpan.textContent = currentYear;
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+</body>
+
+</html>
