@@ -1,0 +1,395 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+}
+
+h1 {
+    font-size: 3.5em;
+}
+
+h2 {
+    font-size: 2.7em;
+}
+
+h3 {
+    font-size: 2em;
+}
+
+p {
+    font-size: 1.25em;
+}
+
+ul {
+    list-style: none;
+}
+
+li {
+    font-size: 1.25em;
+}
+
+button {
+    font-size: 1.25em;
+    font-weight: bold;
+    padding: 10px 30px;
+    border-radius: 5px;
+    border: 2px solid rgba(0, 0, 0, 0.3);
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    color: white;
+    background-color:rgb(19, 119, 44);
+}
+
+button:hover {
+    background-color: rgb(19, 119, 44);
+}
+
+.container {
+    max-width: 1400px;
+    margin: auto;
+}
+
+.color-acento {
+    color: rgb(19, 119, 44);
+}
+
+/*
+header.masthead {
+    padding-top: 10.5rem;
+    padding-bottom: 6rem;
+    text-align: center;
+    color: #fff;
+    background-image: url("../img/header_animales.jpg");
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-position: center center;
+    background-size: cover;
+  }
+*/
+
+header {
+    background-color: rgb(245, 245, 245);
+}
+
+header .logo {
+    margin: 0;
+    padding: 25px 30px;
+    font-weight: bold;
+    color: rgb(19, 119, 44);
+    font-size: 1.6em;
+}
+
+header .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header nav {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding-bottom: 25px;
+}
+
+header a {
+    padding: 5px 12px;
+    text-decoration: none;
+    font-weight: bold;
+    color: black;
+}
+
+header a:hover {
+    color:rgb(13, 184, 56);
+}
+
+#hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+    background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("../img/predecir/tiger.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    text-align: center;
+}
+
+#hero .column {
+    flex: 1;
+    padding: 20px;
+}
+
+#hero .text-content {
+    color: white;
+}
+
+#hero button {
+    font-size: 1.75em;
+}
+
+#instrucciones .container {
+    text-align: center;
+    padding: 200px 12px;
+}
+
+@media (min-width: 850px) {
+    header {
+        position: fixed;
+        width: 100%;
+    }
+
+    header .container {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    header nav {
+        flex-direction: row;
+        padding-bottom: 0;
+        padding-right: 20px;
+    }
+
+    #hero h1 {
+        font-size: 5em;
+    }
+
+    #instrucciones .container {
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    #instrucciones .texto {
+        width: 50%;
+        max-width: 600px;
+        text-align: initial;
+        padding-left: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    #instrucciones h2 {
+        margin-top: 0px;
+    }
+
+    #instrucciones .img-container {
+        background-image: url("../img/predecir/instrucions.jpg");
+        background-size: cover;
+        background-position: center center;
+        height: 500px;
+        width: 500px;
+    }
+
+    
+
+    footer .container {
+        justify-content: flex-end;
+    }
+}
+
+@media (min-width: 1200px) {
+    #predecir {
+        background-position-x: calc(100vw - 800px);
+        /*margin: 40px;*/
+    }
+}
+
+/* Para pantallas pequeñas, típicamente teléfonos móviles */
+@media (max-width: 576px) {
+    #predecir {
+     margin-top: 40px;
+    }
+  }
+
+
+.link_blanco{
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+}
+.predecir{
+    background-image: url('../img/predecir/uron.jpg');
+    background-size: cover;
+    
+    background-position: center;
+}
+
+/*si vas a poner mas css aslo desde aqui */
+
+/*nuevo */
+
+.result{
+    color: white;
+}
+
+
+#animal-form {
+    background-color: #444;
+    padding: 2em;
+    border-radius: 5px;
+    color: white;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1em; /* Tamaño de fuente base */
+}
+
+#animal-form input,
+#animal-form textarea,
+#animal-form select {
+    width: 100%;
+    padding: 0.5em;
+    margin-bottom: 1em;
+    box-sizing: border-box;
+    border-radius: 3px;
+    border: none;
+    font-size: 1em; /* Tamaño de fuente para los campos */
+}
+
+#animal-form h2 {
+    margin-top: 0;
+    
+}
+.seleccionarr {
+    font-size: 1em; /* Tamaño de fuente base */
+}
+
+@media screen and (max-width: 768px) {
+    .seleccionarr {
+        font-size: 0.8em; /* Reducir el tamaño de fuente para pantallas más pequeñas */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .seleccionarr {
+        font-size: 0.6em; /* Reducir aún más el tamaño de fuente para dispositivos móviles */
+    }
+}
+
+#animal-form input, #animal-form select, #animal-form button {
+    display: block;
+    width: 100%;
+    margin-top: 1em;
+    
+}
+
+#animal-form button {
+    background-color: #555;
+    border: none;
+    padding: 1em;
+    cursor: pointer;
+    
+}
+
+.result {
+    margin-top: 2em;
+}
+
+.result img {
+    max-width: 100%; /* La imagen se ajustará al ancho de su contenedor */
+    height: auto; /* La altura se ajustará automáticamente para mantener la relación de aspecto */
+    max-height: 100%; /* Establece una altura máxima para evitar que la imagen se haga demasiado pequeña en zoom */
+}
+.chat-box {
+    margin-top: 1em;
+    padding: 1em;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+}
+
+label:hover, button:hover{
+    background-color: rgb(216, 199, 46);
+}
+
+.link_blanco{
+    color: white; /* Cambia el color predeterminado de los enlaces a blanco */
+    text-decoration: none; /* Opcional: quita el subrayado predeterminado de los enlaces */
+}
+label, button{
+    font-size: 1.25em;
+    font-weight: bold;
+    padding: 10px 30px;
+    border-radius: 5px;
+    border: 2px solid rgba(0,0,0,0.3);
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+    color: white;
+    background-color: rgb(11, 99, 30);
+}
+
+#prediccion {
+    width: 80%; /* Ancho del section */
+    margin: 0 auto; /* Esto centra horizontalmente el section */
+    padding: 20px; /* Espaciado interior del section */
+    background-color: #000000; /* Color de fondo del section */
+    border: 1px solid #ccc; /* Borde del section */
+    box-shadow: 0 0 10px rgba(83, 255, 15, 0.945); /* Sombra del section */
+}
+
+#boton_imagen{
+    padding-left: 20%;
+    padding-right: 20%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+    margin: 0 auto; /* Centra horizontalmente el elemento en la página */
+}
+
+.bander {
+    padding-left: 150px;
+    padding-right: 150px;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    margin: 0;
+    background-image: url("../img/predecir/banderaBoli.jpg");
+    background-size: 100%;
+}
+
+
+.chat-box {
+    width: calc(100%*-30px);
+    border: none;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    box-shadow: inset 0 0 10px rgba(red, green, blue, 0.5);
+    white-space: pre-wrap;
+    font-size: 1.25em;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+
+.chat-entry {
+    margin-bottom: 15px;
+    line-height: 1.4;
+    color: #555;
+}
+
+
+/* Para pantallas pequeñas, típicamente teléfonos móviles */
+@media (max-width: 576px) {
+    .chat-box {
+        width: calc(100%*-30px);
+        height: 400px;
+        border: none;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        overflow-y: auto;
+        background-color: #f9f9f9;
+        box-shadow: inset 0 0 10px rgba(red, green, blue, 0.5);
+        white-space: pre-wrap;
+        font-size: 1.25em;
+        font-weight: bold;
+        border-radius: 5px;
+    }
+  }

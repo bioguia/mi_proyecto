@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLASIFICADOR DE ANIMALES</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/prd.css') }}">
+
+    <!-- Estilos Bootstrap 5 -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css" />
+    <style>
+       .minimodal {
+    display: none;
+    position: fixed;
+    z-index: 1060; /* Asegurarse de que el mini modal aparezca delante del modal */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 500px;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+}
+
+.minimodal-dialog {
+    margin: 0;
+}
+
+.minimodal-content {
+    border-radius: .3rem;
+    max-height: 80vh; /* Altura máxima del contenido del mini modal */
+    overflow-y: auto; /* Habilitar desplazamiento vertical cuando el contenido exceda la altura máxima */
+}
+
+.minimodal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Media query para ajustar el tamaño del mini modal en pantallas más pequeñas */
+@media (max-width: 576px) {
+    .minimodal {
+        width: 90%;
+        max-width: none; /* Eliminar el máximo ancho para permitir que el contenido se ajuste */
+    }
+}   
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+            line-height: 1;
+            color: #000;
+            opacity: .5;
+        }
+
+        .btn-close:hover {
+            color: #000;
+            text-decoration: none;
+            opacity: .75;
+        }
+
+        .btn-close::before {
+            content: '\00d7'; /* Unicode para el símbolo de "X" */
+            font-size: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #5a6268;
+        }
+
+        @media (max-width: 576px) {
+            .minimodal {
+                width: 90%;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">Animal-Guia!</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="fas fa-bars ms-1"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="#predecir">Predecir</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#instrucciones">Instrucciones</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contacto</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Inicio</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="hero">
+        <div class="column text-content">
+            <h1>Busca <br><span class="color-acento">&</span><br> Descubre</h1><br>
+            <button onclick="scrollToSection('predecir')">Diviértete</button>
+        </div>
+    </section>
+
+    <div class="container" id="predecir">
+        <div class="predecir text-center">
+            <form action="/" method="post" enctype="multipart/form-data" id="animal-form">
+                <h2 class="seleccionarr" style="color: white;">CLICK EN SELECCIONAR PARA INSERTAR IMAGEN:</h2>
+                <label id="boton_imagen" class="bo" for="image">Seleccionar</label> <br>
+                <input type="file" id="image" name="image" accept="image/*" title="Seleccionar imagen"
+                    onchange="enablePredictButton()">
+                <select id="model" name="model">
+                    {% for model_name in model_names %}
+                    <option value="{{ model_name }}">{{ model_name }}</option>
+                    {% endfor %}
+                </select>
+                <button class="link_blanco" type="button" id="predictButton" disabled>Predecir</button>
+            </form>
+        </div>
+        <div class="modal fade" id="predictionModal" tabindex="-1" aria-labelledby="predictionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="predictionModalLabel">Resultados de la Predicción</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <img id="modalImage" src="" alt="Imagen del Animal" class="img-fluid">
+                        <div id="predicted-results"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="minimodal" id="miniModal">
+            <div class="minimodal-dialog">
+                <div class="minimodal-content">
+                    <div class="minimodal-header">
+                        <h5 class="minimodal-title" id="animal-name-modal"></h5>
+                        <button type="button" class="btn-close" aria-label="Close" onclick="closeMiniModal()"></button>
+                    </div>
+                    <div class="minimodal-body" id="descriptionBox">
+                        <!-- Contenido del mini modal -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" onclick="closeMiniModal()">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <section id="instrucciones">
+            <div class="container">
+                <div class="img-container"></div>
+                <div class="texto">
+                    <h2><span class="color-acento">Instrucciones</span></h2>
+                    <p>Para usar este programa, primero haga clic en 'Seleccionar Imagen' y luego, después de
+                        seleccionarla,
+                        haga clic en 'Predecir'. El programa le mostrará un resultado indicando a qué animal se parece
+                        su
+                        imagen y un porcentaje de precisión asociado. Y luego darle al botón descripción para ver la
+                        descripción del animal</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contacto-->
+        <section class="page-section" id="contact">
+            <div class="container">
+                <div class="text-center">
+                    <h2 class="section-heading text-uppercase">CONTÁCTENOS</h2><br>
+                    <h3 class="section-subheading text-muted">¿Tienes alguna pregunta o necesitas más información?
+                        ¡Estamos aquí para ayudarte!</h3>
+                </div>
+                <!-- * * * * * * * * * * * * * * *-->
+                <!-- * * SB Forms Contact Form * *-->
+                <!-- * * * * * * * * * * * * * * *-->
+                <!-- This form is pre-integrated with SB Forms.-->
+                <!-- To make this form functional, sign up at-->
+                <!-- https://startbootstrap.com/solution/contact-forms-->
+                <!-- to get an API token!-->
+                <form id="contactForm" data-sb-form-api-token="API_TOKEN">
+                    <div class="row align-items-stretch mb-5">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <!-- Name input-->
+                                <input class="form-control" id="name" type="text" placeholder="Su nombre *"
+                                    data-sb-validations="required" />
+                                <div class="invalid-feedback" data-sb-feedback="name:required">Se requiere un nombre.
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <!-- Email address input-->
+                                <input class="form-control" id="email" type="email"
+                                    placeholder="Tu correo electrónico *" data-sb-validations="required,email" />
+                                <div class="invalid-feedback" data-sb-feedback="email:required">Se requiere un email.
+                                </div>
+                                <div class="invalid-feedback" data-sb-feedback="email:email">El correo no es válido.
+                                </div>
+                            </div>
+                            <div class="form-group mb-md-0">
+                                <!-- Phone number input-->
+                                <input class="form-control" id="phone" type="tel" placeholder="Su teléfono *"
+                                    data-sb-validations="required" />
+                                <div class="invalid-feedback" data-sb-feedback="phone:required">Se requiere un número de
+                                    teléfono.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group form-group-textarea mb-md-0">
+                                <!-- Message input-->
+                                <textarea class="form-control" id="message" placeholder="Tu mensaje *"
+                                    data-sb-validations="required"></textarea>
+                                <div class="invalid-feedback" data-sb-feedback="message:required">Se requiere un
+                                    mensaje.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Submit success message-->
+                    <!---->
+                    <!-- This is what your users will see when the form-->
+                    <!-- has successfully submitted-->
+                    <div class="d-none" id="submitSuccessMessage">
+                        <div class="text-center text-white mb-3">
+                            <div class="fw-bolder">Envío de formulario exitoso!</div>
+                            <!--Para activar este formulario, regístrate en
+                        <br />
+                        <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>-->
+                        </div>
+                    </div>
+                    <!-- Submit error message-->
+                    <!---->
+                    <!-- This is what your users will see when there is-->
+                    <!-- an error submitting the form-->
+                    <div class="d-none" id="submitErrorMessage">
+                        <div class="text-center text-danger mb-3">¡Error al enviar el mensaje!</div>
+                    </div>
+                    <!-- Submit Button-->
+                    <div class="text-center"><button class="btn btn-primary btn-xl text-uppercase disabled"
+                            id="submitButton" type="submit">Enviar mensaje</button></div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Footer-->
+        <footer class="footer py-4">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-4 text-lg-start">Copyright &copy; Animal guia! <span id="year"></span></div>
+                    <div class="col-lg-4 my-3 my-lg-0">
+                        <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Twitter"><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Facebook"><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="LinkedIn"><i
+                                class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-dark btn-social mx-2" href="https://www.youtube.com/@felipetutech"
+                            aria-label="LinkedIn" target="_blank"><i class="fab fa-youtube"></i></a>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">Universidad Loyola. [La Paz - Bolivia]</div>
+                </div>
+            </div>
+        </footer>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+       <!-- jQuery y Bootstrap 5 JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#predictButton').click(function () {
+                var form = $('#animal-form')[0];
+                var formData = new FormData(form);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/predict',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        var imagePathWithTimestamp = response.image_path;
+                        $('#modalImage').attr('src', imagePathWithTimestamp);
+                        var predictedResults = response.predicted_results.map(result => result.replace(/[0-9\-.]/g, '')); // Eliminar números, guiones y puntos
+                        $('#predicted-results').html(predictedResults.map(result => `
+                            <p>Clase: ${result}</p>
+                            <button type="button" class="btn btn-info description-btn" data-class="${result}">Mostrar Descripción</button>
+                            <button type="button" class="btn btn-info caracteristicas-btn" data-class="${result}">Mostrar Características</button>
+                            <button type="button" class="btn btn-info PEL-btn" data-class="${result}">Peligro de Extinción</button>
+                            <button type="button" class="btn btn-info COMO-btn" data-class="${result}">Cómo Cuidarse o Cuidarlas</button>
+                        `).join(''));
+                        $('#predictionModal').modal('show');
+                    },
+                    error: function () {
+                        alert('Error al realizar la predicción.');
+                    }
+                });
+            });
+
+            // Manejo del clic en el botón de descripción
+            $(document).on('click', '.description-btn', function () {
+                var animalClass = $(this).data('class');
+                $('#animal-name-modal').text(animalClass); // Mostrar el nombre del animal en la mini ventana
+                $('#miniModal').show(); // Mostrar la mini ventana con el nombre del animal
+                buscarDescripcion(animalClass);
+            });
+
+            // Manejo del clic en el botón de características
+            $(document).on('click', '.caracteristicas-btn', function () {
+                var animalClass = $(this).data('class');
+                $('#animal-name-modal').text(animalClass); // Mostrar el nombre del animal en la mini ventana
+                $('#miniModal').show(); // Mostrar la mini ventana con el nombre del animal
+                buscarCara(animalClass);
+            });
+
+            // Manejo del clic en el botón de peligro de extinción
+            $(document).on('click', '.PEL-btn', function () {
+                var animalClass = $(this).data('class');
+                $('#animal-name-modal').text(animalClass); // Mostrar el nombre del animal en la mini ventana
+                $('#miniModal').show(); // Mostrar la mini ventana con el nombre del animal
+                buscarPEL(animalClass);
+            });
+
+            // Manejo del clic en el botón de cómo cuidarlas
+            $(document).on('click', '.COMO-btn', function () {
+                var animalClass = $(this).data('class');
+                $('#animal-name-modal').text(animalClass); // Mostrar el nombre del animal en la mini ventana
+                $('#miniModal').show(); // Mostrar la mini ventana con el nombre del animal
+                buscarComo(animalClass);
+            });
+
+            // Cerrar mini modal
+            $(document).on('click', '.btn-close, .btn-secondary', function () {
+                $('#miniModal').hide();
+            });
+
+            function buscarDescripcion(animalClass) {
+                $.getJSON("/static/animales.json", function (data) {
+                    var descripcion = "Descripción no encontrada";
+                    for (var i = 0; i < data.animales.length; i++) {
+                        if (data.animales[i].nombre.trim().toLowerCase() === animalClass.trim().toLowerCase()) {
+                            nombre = data.animales[i].nombre;
+                            tipo = data.animales[i].tipo;
+                            frase = data.animales[i].frase;
+                            descripcion = data.animales[i].descripcion;
+                            break;
+                        }
+                    }
+                    $('#descriptionBox').html(`<center>${nombre}</center><center>${tipo}</center><br><center>${frase}</center><br><p>${descripcion}</p>`);
+                });
+            }
+
+            function buscarCara(animalClass) {
+                $.getJSON("/static/animales.json", function (data) {
+                    var caracteristicas = "Características no encontradas";
+                    for (var i = 0; i < data.animales.length; i++) {
+                        if (data.animales[i].nombre.trim().toLowerCase() === animalClass.trim().toLowerCase()) {
+                            nombre = data.animales[i].nombre;
+                            tipo = data.animales[i].tipo;
+                            frase = data.animales[i].frase;
+                            caracteristicas = data.animales[i].caracteristicas;
+                            break;
+                        }
+                    }
+                    $('#descriptionBox').html(`<center>${nombre}</center><center>${tipo}</center><br><center>${frase}</center><br><p>${caracteristicas}</p>`);
+                });
+            }
+
+            function buscarPEL(animalClass) {
+                $.getJSON("/static/animales.json", function (data) {
+                    var peligroExtincion = "Peligro de extinción no encontrado";
+                    for (var i = 0; i < data.animales.length; i++) {
+                        if (data.animales[i].nombre.trim().toLowerCase() === animalClass.trim().toLowerCase()) {
+                            nombre = data.animales[i].nombre;
+                            tipo = data.animales[i].tipo;
+                            frase = data.animales[i].frase;
+                            peligroExtincion = data.animales[i].PELIGRODEEXTINCION;
+                            break;
+                        }
+                    }
+                    $('#descriptionBox').html(`<center>${nombre}</center><center>${tipo}</center><br><center>${frase}</center><br><p>${peligroExtincion}</p>`);
+                });
+            }
+
+            function buscarComo(animalClass) {
+                $.getJSON("/static/animales.json", function (data) {
+                    var comoCuidarse = "Cómo cuidarse no encontrado";
+                    for (var i = 0; i < data.animales.length; i++) {
+                        if (data.animales[i].nombre.trim().toLowerCase() === animalClass.trim().toLowerCase()) {
+                            nombre = data.animales[i].nombre;
+                            tipo = data.animales[i].tipo;
+                            frase = data.animales[i].frase;
+                            comoCuidarse = data.animales[i].COMOCUIDARLASOCUIDARSE;
+                            break;
+                        }
+                    }
+                    $('#descriptionBox').html(`<center>${nombre}</center><center>${tipo}</center><br><center>${frase}</center><br><p>${comoCuidarse}</p>`);
+                });
+            }
+        });
+
+        function enablePredictButton() {
+            $('#predictButton').prop('disabled', !$('#animalImage').val());
+        }
+    </script>
+        <script>
+            function enablePredictButton() {
+                document.getElementById('predictButton').disabled = false;
+            }
+        </script>
+        <script>
+            // Obtener el elemento span donde se mostrará el año
+            var yearSpan = document.getElementById("year");
+
+            // Obtener el año actual
+            var currentYear = new Date().getFullYear();
+
+            // Actualizar el contenido del span con el año actual
+            yearSpan.textContent = currentYear;
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+        <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+        <script>
+            $(document).ready(function () {
+                $('.tiger-form').submit(function (event) {
+                    event.preventDefault(); // Evita que el formulario se envíe de forma predeterminada
+
+                    // Desactivar el botón para evitar múltiples clics
+                    $('.tiger-form button[type="submit"]').prop('disabled', true);
+
+                    var animalClass = $(this).find('input[name="animal_class"]').val(); // Obtener la clase del animal del formulario
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/m',
+                        data: {
+                            user_input: $(this).data('description').replace('{{ predicted_class }}', animalClass),
+                            question: false // Indica que no es una pregunta
+                        },
+                        success: function (response) {
+                            $('#conversation').html(response.conversation); // Actualiza la conversación en el div
+                        },
+                        complete: function () {
+                            // Reactivar el botón después de completar la solicitud
+                            $('.tiger-form button[type="submit"]').prop('disabled', false);
+                        }
+                    });
+                });
+
+                $('.chat-form').submit(function (event) {
+                    event.preventDefault(); // Evita que el formulario se envíe de forma predeterminada
+
+                    // Desactivar el botón para evitar múltiples clics
+                    $('.chat-form button[type="submit"]').prop('disabled', true);
+
+                    var question = $(this).data('question');
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/m',
+                        data: {
+                            user_input: question,
+                            question: true // Indica que es una pregunta
+                        },
+                        success: function (response) {
+                            $('#conversation').html(response.conversation); // Actualiza la conversación en el div
+                        },
+                        complete: function () {
+                            // Reactivar el botón después de completar la solicitud
+                            $('.chat-form button[type="submit"]').prop('disabled', false);
+                        }
+                    });
+                });
+            });
+        </script>
+ <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+ <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+     integrity="sha384-IQsoLXlIZLny/4+963pK1VZ0GHmgBeD9eI2cfQa/TG1RXY/sg4C/a/zp8wRV5qbf" crossorigin="anonymous">
+ </script>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+     integrity="sha384-cVKIPhG0pCw5SX5z/t6fyy0QpBBVbWm6fGib4QnEjAoB9rG9Y7Ray+OrB43F7haF" crossorigin="anonymous">
+ </script>
+ <script>
+     function enablePredictButton() {
+         document.getElementById('predictButton').disabled = false;
+     }
+
+     function openMiniModal(animalName, description) {
+         document.getElementById('animal-name-modal').innerText = animalName;
+         document.getElementById('descriptionBox').innerText = description;
+         document.getElementById('miniModal').style.display = 'block';
+     }
+
+     function closeMiniModal() {
+         document.getElementById('miniModal').style.display = 'none';
+     }
+
+     function scrollToSection(sectionId) {
+         document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+     }
+ </script>
+</body>
+
+</html>
